@@ -989,6 +989,80 @@ footer p {
   opacity: 0.5;
 }
 
+.music-island {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 300px;
+    z-index: 2000;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(15, 15, 20, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(140, 58, 232, 0.3);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(140, 58, 232, 0.2);
+}
+
+.music-island.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.track-info {
+    margin-bottom: 12px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#player-status {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #8c3ae8;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+#current-track-name {
+    color: #eee;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.controls button {
+    background: rgba(140, 58, 232, 0.1);
+    border: 1px solid rgba(140, 58, 232, 0.2);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.controls button:hover {
+    background: #8c3ae8;
+    box-shadow: 0 0 10px #8c3ae8;
+}
+
+#volume-slider {
+    flex-grow: 1;
+    accent-color: #8c3ae8;
+    height: 4px;
+    cursor: pointer;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1085,87 +1159,6 @@ footer p {
   footer {
     padding: 30px;
   }
-}
-
-.music-island {
-    /* Позиционирование */
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 300px;
-    z-index: 2000;
-
-    /* Скрываем до загрузки */
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none;
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-
-    /* Единый стиль: Glassmorphism */
-    background: rgba(15, 15, 20, 0.8);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(140, 58, 232, 0.3); /* Твой фиолетовый акцент */
-    border-radius: 20px;
-    padding: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(140, 58, 232, 0.2);
-}
-
-/* Класс, который мы добавим через JS после загрузки */
-.music-island.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-/* Внутренние элементы в стиле сайта */
-.track-info {
-    margin-bottom: 12px;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-#player-status {
-    display: block;
-    font-size: 10px;
-    text-transform: uppercase;
-    color: #8c3ae8; /* Твой основной цвет */
-    letter-spacing: 2px;
-    margin-bottom: 4px;
-}
-
-#current-track-name {
-    color: #eee;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.controls button {
-    background: rgba(140, 58, 232, 0.1);
-    border: 1px solid rgba(140, 58, 232, 0.2);
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.controls button:hover {
-    background: #8c3ae8;
-    box-shadow: 0 0 10px #8c3ae8;
-}
-
-#volume-slider {
-    flex-grow: 1;
-    accent-color: #8c3ae8;
-    height: 4px;
-    cursor: pointer;
 }
 
 @media (max-width: 767px) {
