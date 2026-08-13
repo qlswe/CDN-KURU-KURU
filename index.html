@@ -1,215 +1,254 @@
+<!DOCTYPE html>
 <html lang="ru">
- <head>
- <meta charset="utf-8"/>
- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
- <link rel="icon" type="image/png" href="logo.png" />
- <meta name="description" content="Био クルシーP." />
- <meta name="author" content="クルシーP"/>
- <title>BIO | クルシーP</title>
- <link rel="stylesheet"href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <link rel="stylesheet" href="https://wbm-static.my1.ru/style.ru.css">
- <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
- <script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/lunr-languages/lunr.stemmer.support.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/lunr-languages/lunr.ru.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/lunr-languages/lunr.multi.js"></script>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Open Graph SEO (Для красивых превью в Telegram/VK/Discord) -->
+    <meta property="og:title" content="BIO | クルシーP" />
+    <meta property="og:description" content="Официальная страница クルシーP: проекты, переводы, Vocaloid/UTAU и министерство Ахахи." />
+    <meta property="og:image" content="https://placehold.co/1200x630/8c3ae8/FFF?text=Kuru+Kuru" />
+    <meta property="og:url" content="https://kuru-kuru.ru/" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#8c3ae8" />
+
+    <title>BIO | クルシーP</title>
+
+    <!-- Подключение шрифтов (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Подключение иконок FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Подключение стилей AOS (Анимации при скролле) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Основной файл стилей -->
+    <link rel="stylesheet" href="style.ru.css">
+
+    <style>
+        /* Базовые стили для кастомного курсора, которых не было в основном CSS */
+        #custom-cursor {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+    </style>
 </head>
-<body data-aos-easing="ease-in-out" data-aos-duration="800">
- <canvas id="particles-canvas"></canvas>
- <div class="custom-cursor" id="custom-cursor"></div>
- <div id="loading-screen">
- <canvas id="loading-particles"></canvas>
- <canvas id="loading-canvas"></canvas>
- <p id="loading-text">Я найду тебя, Акивили</p>
- <div id="loading-progress-container">
- <div id="loading-progress"></div>
- </div>
- </div>
- <nav class="navbar navbar-expand-lg" id="mainNav">
- <div class="container px-4 px-lg-5">
- <a class="navbar-brand" href="https://kuru-kuru.ru/">
- <span class="logo-text">BIO | クルシーP</span>
- </a>
- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
- <span class="navbar-toggler-icon"></span>
- </button>
- <div class="collapse navbar-collapse" id="navbarResponsive">
- <ul class="navbar-nav ms-auto py-4 py-lg-0">
- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://kuru-kuru.ru/">Домашняя страница</a></li>
- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://kuru-kuru-video.vercel.app/">KURU-KURU | VIDEO</a></li>
- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://ministry-ahahi.vercel.app/">Министерство Ахахи</a></li>
- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#" id="logsysLink">Логи</a></li>
- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://kuru-kuru.ru/EN.html">English Version</a></li>
- </ul>
- </div>
- </div>
- </nav>
- <header class="masthead" data-aos="fade-in">
- <div class="container position-relative px-4 px-lg-5">
- <div class="row gx-4 gx-lg-5 justify-content-center">
- <div class="col-md-10 col-lg-8 col-xl-7">
- <div class="site-heading text-center">
- <h3 id="slide-title"></h3>
- <span id="slide-subtitle" class="subheading"></span>
- </div>
- </div>
- </div>
- </div>
- <div class="banner-nav">
- <button id="prev-banner" class="banner-button prev">&#10094;</button>
- <button id="next-banner" class="banner-button next">&#10095;</button>
- </div>
- <div class="banner-counter" id="banner-counter"></div>
- </header>
- <div class="search-bar" data-aos="fade-down">
- <input type="text" id="search-input" placeholder="Поиск по карточкам..." aria-label="Поиск">
- <button id="search-button" aria-label="Поиск"><i class="fas fa-search"></i></button>
- <button class="voice-search-btn" id="voice-search" aria-label="Голосовой поиск"><i class="fas fa-microphone"></i></button>
- </div>
- <div id="search-results"></div>
- <div class="welcome-message" data-aos="zoom-in">
- <h2>Вы наткнулись на мой сайт? Рад видеть!</h2>
- <p>Здесь вы найдете всю актуальную (а может нет) информацию о クルシーP</p>
- </div>
- <div class="content-section" data-aos="fade-up">
- <div class="card" data-aos="flip-left">
-<i class="fa-solid fa-eye card-icon"></i>
- <h2>Проекты</h2>
- <div class="toggle-info">
- <button class="arrow-button" onclick="toggleInfo('project', this)">Показать</button>
- <div class="additional-info" id="projectInfo">
- <p>На данный момент у меня 3 проекта:</p>
- <ul>
- <li>クルシーP переводит</li>
- <li>KURU-KURU | VIDEO</li>
- <li>Министерство Ахахи</li> 
- </ul>
- <p>ТГ канал クルシーP переводит: <a href="https://t.me/qlseeh_translations" target="_blank">https://t.me/qlseeh_translations</a></p>
- <p>Ссылка на KURU KURU | VIDEO (сайт относится к クルシーP переводит): <a href="https://kuru-kuru-video.vercel.app/" target="_blank">https://kuru-kuru-video.vercel.app/</a></p>
- <p>Ссылка на Министерство Ахахи: <a href="https://ministry-ahahi.vercel.app/" target="_blank">https://ministry-ahahi.vercel.app/</a></p>
- </div>
- </div>
- </div>
- <div class="card" data-aos="flip-left" data-aos-delay="200">
- <i class="fas fa-heart card-icon"></i>
- <h2>Фандомы</h2>
- <div class="toggle-info">
- <button class="arrow-button" onclick="toggleInfo('fandom', this)">Показать</button>
- <div class="additional-info" id="fandomInfo">
- <p>Фандомы, проекты, группы Vocaloid'ов/UTAU, японские исполнители и просто исполнители, которые мне нравятся (список не полный):</p>
- <ul>
- <li>Honkai: Star Rail</li>
- <li>Zenless Zone Zero</li>
- <li>Sekai Project</li>
- <li>Diablo</li>
- <li>Sky Children of the Light</li>
- <li>Отель Хазбин</li>
- <li>Зоофобия</li>
- <li>Цифровой Цирк</li>
- <li>Очень странные дела</li>
- <li>Эхо террора</li>
- <li>Адский Босс</li>
- <li>Клинок рассекающий демонов</li>
- <li>Двуличная сестрёнка Умару-чан!</li>
- <li>Туалетный мальчик Ханако</li>
- <li>Евангелион</li>
- <li>Хроники Эвиллиоса</li>
- <li>Метал Фемили</li>
- <li>PinocchioP</li>
- <li>syudou</li>
- <li>Ado</li>
- <li>Kikuo</li>
- <li>meiyo</li>
- <li>cosMo＠暴走P</li>
- <li>biz</li>
- <li>flower</li>
- <li>Eve</li>
- <li>COOL & CREATE</li>
- <li>Yoh Kamiyama</li>
- <li>Sasuke Haraguchi</li>
- <li>jon-YAKITORY</li>
- <li>Giga</li>
- <li>Chinozo</li>
- <li>Jun Togawa</li>
- <li>Guchiry</li>
- <li>SLAVE.V-V-R</li>
- <li>Creepy Nuts</li>
- <li>MORE! JUMP! MORE!</li>
- <li>25 Nightcord</li>
- <li>Vivid BAD SQUAD</li>
- <li>Parsley Onuma</li>
- <li>Kairikibear</li>
- <li>PEPOYO</li>
- <li>Akuno_P</li>
- <li>wowaka</li>
- <li>Mitchie M</li>
- <li>Ryo (supercell)</li>
- <li>MARETU</li>
- <li>Mafumafu</li>
- <li>DECO*27</li>
- <li>Kanaria</li>
- <li>Данганронпа</li>
- <li>Hitoshizuku × Yama△</li>
- <li>Alien Stage</li>
- </ul>
- </div>
- </div>
- </div>
- <div class="card" data-aos="flip-left" data-aos-delay="400">
- <i class="fas fa-star card-icon"></i>
- <h2>Любимые</h2>
- <div class="toggle-info">
- <button class="arrow-button" onclick="toggleInfo('hyperfix', this)">Показать</button>
- <div class="additional-info" id="hyperfixInfo">
- <p>На данный момент у меня 2 любимых персонажа:</p>
- <ul>
- <li>Великая Герта, Анакса</li>
- </ul>
- </div>
- </div>
- </div>
- <div class="card" data-aos="flip-left" data-aos-delay="600">
- <i class="fas fa-lightbulb card-icon"></i>
- <h2>Рандом факт</h2>
- <p id="fun-fact"></p>
- <div class="toggle-info"></div>
- </div>
- </div>
- <footer id="footer">
- <p>&copy; 2026 クルシーP. Все права принадлежат их правообладателям.</p>
- <p class="version">Версия сайта: releases-v2.6.0</p>
- <div class="social-links">
- <a href="https://t.me/qlseeh_translations" target="_blank" aria-label="Telegram Channel"><i class="fab fa-telegram"></i></a>
- <a href="#" target="_blank" aria-label="Instagram"><i class="fa-brands fa-bluesky"></i></a>
- </div>
- </footer>
- <button id="back-to-top" aria-label="Наверх">
- <i class="fas fa-arrow-up"></i>
- </button>
- <div id="logger-window">
- <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
- <h4>Логи страницы</h4>
- <button id="close-logger">&times;</button>
- </div>
- <div style="margin-bottom: 18px;">
- <label for="log-level-filter">Фильтр по уровню:</label>
- <select id="log-level-filter">
- <option value="all">Все</option>
- <option value="core">CORE</option>
- <option value="info">INFO</option>
- <option value="warn">WARN</option>
- <option value="error">ERROR</option>
- <option value="debug">DEBUG</option>
- </select>
- </div>
- <div id="log-content"></div>
- </div>
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
- <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
- <script src="https://wbm-static.my1.ru/main_core.ru.js"></script>
-<script src="$POWERED_BY$"></script>
- </body>
+<body>
+
+    <!-- Кастомный курсор -->
+    <div id="custom-cursor"></div>
+
+    <!-- Фоновый 3D холст Three.js -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Экран загрузки -->
+    <div id="loading-screen">
+        <canvas id="loading-particles"></canvas>
+        <canvas id="loading-canvas" width="150" height="150"></canvas>
+        <h2 id="loading-text">ИНИЦИАЛИЗАЦИЯ...</h2>
+        <div id="loading-progress-container">
+            <div id="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Баннер системы безопасности (WBUID) -->
+    <div id="unique-id-banner" class="banner-info" style="display: none;">
+        <h2>Идентификация Системы</h2>
+        <p>Ваш уникальный защищенный WBUID: <br><strong id="wbuid-text" style="word-break: break-all; color: var(--accent-secondary);"></strong></p>
+        <button id="close-id-banner" class="arrow-button">Подтвердить</button>
+    </div>
+
+    <!-- Навигационная панель -->
+    <nav class="navbar">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div class="navbar-brand">クルシーP</div>
+            <div style="display: flex; align-items: center;">
+                <a href="#" id="logsysLink" class="nav-link" style="text-decoration: none;"><i class="fas fa-terminal"></i> Логи</a>
+                <button id="theme-toggle" aria-label="Переключить тему"><i class="fas fa-adjust"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главный баннер (Ротатор) -->
+    <header class="masthead">
+        <button id="prev-banner" class="banner-button"><i class="fas fa-chevron-left"></i></button>
+        <div class="site-heading">
+            <h3 id="slide-title">Загрузка...</h3>
+            <div class="subheading" id="slide-subtitle">Инициализация контента</div>
+        </div>
+        <button id="next-banner" class="banner-button"><i class="fas fa-chevron-right"></i></button>
+        <div id="banner-counter" class="banner-counter">1 / 5</div>
+    </header>
+
+    <!-- Приветственный блок и интересные факты -->
+    <section class="welcome-message" data-aos="fade-up">
+        <h2>Доступ к Терминалу Разрешен</h2>
+        <p>Случайный факт из базы данных: <br><strong id="fun-fact" style="color: var(--accent-secondary);">Генерация...</strong></p>
+    </section>
+
+    <!-- Поисковая система (Lunr.js + Голос) -->
+    <section class="search-bar" data-aos="fade-up">
+        <input type="text" id="search-input" placeholder="Поиск по архивам терминала...">
+        <button id="voice-search" class="voice-search-btn" aria-label="Голосовой поиск"><i class="fas fa-microphone"></i></button>
+        <button id="search-button" aria-label="Найти"><i class="fas fa-search"></i></button>
+    </section>
+    <div id="search-results"></div>
+
+    <!-- Основной контент (Карточки) -->
+    <section class="content-section">
+        <!-- Карточка 1: Проекты -->
+        <div class="card" data-aos="fade-up">
+            <i class="fas fa-folder-open card-icon"></i>
+            <h2>Проекты</h2>
+            <p>База данных моих активных разработок и коллабораций.</p>
+            <button class="arrow-button toggle-info" onclick="toggleInfo('project', this)">Показать</button>
+            <div id="projectInfo" class="additional-info">
+                <ul>
+                    <li>BotGDX</li>
+                    <li>BotGD</li>
+                    <li><a href="https://wbot-soft.my1.ru/" target="_blank">Подробнее на wbot-soft</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Карточка 2: Фандомы -->
+        <div class="card" data-aos="fade-up" data-aos-delay="150">
+            <i class="fas fa-headphones card-icon"></i>
+            <h2>Фандомы</h2>
+            <p>Vocaloid, UTAU, любимые игры и музыкальные исполнители.</p>
+            <button class="arrow-button toggle-info" onclick="toggleInfo('fandom', this)">Показать</button>
+            <div id="fandomInfo" class="additional-info">
+                <ul>
+                    <li>Honkai: Star Rail</li>
+                    <li>Sekai Project</li>
+                    <li>PinocchioP, DECO*27, Kikuo, syudou</li>
+                    <li>Метал Фемили, Отель Хазбин</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Карточка 3: Гиперфиксы -->
+        <div class="card" data-aos="fade-up" data-aos-delay="300">
+            <i class="fas fa-star card-icon"></i>
+            <h2>Любимое</h2>
+            <p>Персонажи и вселенные, на которых у меня сейчас гиперфиксация.</p>
+            <button class="arrow-button toggle-info" onclick="toggleInfo('hyperfix', this)">Показать</button>
+            <div id="hyperfixInfo" class="additional-info">
+                <ul>
+                    <li>Honkai: Star Rail</li>
+                    <li>Великая Герта</li>
+                    <li>Анакса</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция галереи -->
+    <section class="gallery-section" data-aos="fade-up">
+        <h2>Медиа-Архив</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openModal('https://placehold.co/800x600/12052a/8c3ae8?text=ART+1', 'Концепт-арт 1')">
+                <img src="https://placehold.co/400x300/12052a/8c3ae8?text=ART+1" alt="Арт 1">
+                <div class="gallery-caption">Концепт-арт 1</div>
+            </div>
+            <div class="gallery-item" onclick="openModal('https://placehold.co/800x600/1a0b36/e83ab5?text=ART+2', 'Концепт-арт 2')">
+                <img src="https://placehold.co/400x300/1a0b36/e83ab5?text=ART+2" alt="Арт 2">
+                <div class="gallery-caption">Концепт-арт 2</div>
+            </div>
+            <div class="gallery-item" onclick="openModal('https://placehold.co/800x600/080216/bf3ae8?text=ART+3', 'Концепт-арт 3')">
+                <img src="https://placehold.co/400x300/080216/bf3ae8?text=ART+3" alt="Арт 3">
+                <div class="gallery-caption">Концепт-арт 3</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Модальное окно для галереи -->
+    <div id="gallery-modal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modal-image" alt="Full Image">
+        <div id="modal-caption" style="text-align:center; color:white; margin-top:15px; font-family: var(--font-secondary); font-size: 1.2rem;"></div>
+    </div>
+
+    <!-- Форма подписки -->
+    <section class="newsletter-section" data-aos="fade-up">
+        <h2>Связь с Терминалом</h2>
+        <p style="margin-bottom: 20px;">Подпишитесь для получения системных обновлений.</p>
+        <form id="newsletter-form" class="newsletter-form">
+            <input type="email" placeholder="Введите ваш e-mail адрес..." required>
+            <button type="submit" class="arrow-button" style="margin-top: 0;">Подписаться</button>
+        </form>
+    </section>
+
+    <!-- Окно кастомного Логгера -->
+    <div id="logger-window">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+            <h4>Системный Журнал / Консоль</h4>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <select id="log-level-filter">
+                    <option value="all">Все уровни</option>
+                    <option value="info">INFO</option>
+                    <option value="warn">WARN</option>
+                    <option value="error">ERROR</option>
+                    <option value="security">SECURITY</option>
+                    <option value="core">CORE</option>
+                </select>
+                <button id="close-logger"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div id="log-content"></div>
+    </div>
+
+    <!-- МУЗЫКАЛЬНЫЙ ПЛЕЕР (Внедрен критический фикс) -->
+    <div class="music-island" id="music-island">
+        <!-- Сам аудиотег, которым управляет JS -->
+        <audio id="main-audio"></audio>
+        
+        <div class="track-info">
+            <span id="player-status">Initializing...</span>
+            <div id="current-track-name">Loading Track...</div>
+        </div>
+        <div class="controls">
+            <button onclick="prevTrack()" aria-label="Предыдущий трек"><i class="fas fa-step-backward"></i></button>
+            <button id="play-pause" onclick="togglePlay()" aria-label="Воспроизведение"><i class="fas fa-play"></i></button>
+            <button onclick="nextTrack()" aria-label="Следующий трек"><i class="fas fa-step-forward"></i></button>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume(this.value)" aria-label="Громкость">
+        </div>
+    </div>
+
+    <!-- Кнопка "Наверх" -->
+    <button id="back-to-top" aria-label="Наверх"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Подвал -->
+    <footer>
+        <p>&copy; 2026 クルシーP. Все права защищены терминалом.</p>
+        <div class="social-links">
+            <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+        <p class="version">Build v2.6.0</p>
+    </footer>
+
+    <!-- Библиотеки и Скрипты -->
+    <!-- Three.js (Для 3D фонов) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- AOS.js (Анимация при скролле) -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Lunr.js (Поисковый движок) -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    
+    <!-- Основной кастомный скрипт -->
+    <script src="main_core.ru.js"></script>
+</body>
 </html>
