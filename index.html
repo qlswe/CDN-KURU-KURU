@@ -3,17 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="theme-color" content="#0d0f12">
   <link rel="icon" type="image/png" href="logo.png" />
-  <meta name="description" content="Био クルシーP." />
+  <link rel="manifest" href="manifest.json">
+  <meta name="description" content="Био クルシーP. Официальный портал и база данных." />
   <meta name="author" content="クルシーP" />
-  <title>BIO | クルシーP</title>
+  <title>BIO | クルシーP v3.0</title>
   
+  <!-- Шрифты и Стили -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.ru.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link rel="stylesheet" href="style.ru.css">
   
+  <!-- Библиотеки -->
   <script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lunr-languages/lunr.stemmer.support.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lunr-languages/lunr.ru.js"></script>
@@ -22,22 +26,30 @@
 </head>
 <body data-aos-easing="ease-in-out" data-aos-duration="800">
   
+  <!-- 3D Фон и Курсор -->
   <canvas id="particles-canvas"></canvas>
   <div class="custom-cursor" id="custom-cursor"></div>
   
   <!-- Экран загрузки -->
   <div id="loading-screen">
     <canvas id="loading-particles"></canvas>
-    <canvas id="loading-canvas"></canvas>
     <p id="loading-text">Я найду тебя, Акивили</p>
     <div id="loading-progress-container">
       <div id="loading-progress"></div>
     </div>
   </div>
 
+  <!-- Переключатель тем (Glassmorphism) -->
+  <div class="theme-selector glass-panel" data-aos="fade-left" data-aos-delay="1000">
+    <div class="theme-dot" style="background: #8c3ae8;" onclick="setTheme('#8c3ae8', '140, 58, 232')" title="Cyber Purple (Default)"></div>
+    <div class="theme-dot" style="background: #00d2ff;" onclick="setTheme('#00d2ff', '0, 210, 255')" title="Ice Blue (Крио)"></div>
+    <div class="theme-dot" style="background: #ff0055;" onclick="setTheme('#ff0055', '255, 0, 85')" title="Ruby Red (Эрудиция)"></div>
+    <div class="theme-dot" style="background: #00ff88;" onclick="setTheme('#00ff88', '0, 255, 136')" title="Matrix Green"></div>
+  </div>
+
   <!-- Баннер с WBUID -->
-  <div id="unique-id-banner" class="banner-info" style="display: none;">
-    <h2>Ваш уникальный ID</h2>
+  <div id="unique-id-banner" class="banner-info glass-panel" style="display: none;">
+    <h2>Ваш уникальный ID (WBUID)</h2>
     <p id="wbuid-text"></p>
     <button id="close-id-banner" class="arrow-button">Закрыть</button>
   </div>
@@ -48,15 +60,15 @@
       <a class="navbar-brand" href="https://kuru-kuru.ru/">
         <span class="logo-text">BIO | クルシーP</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
+        <i class="fas fa-bars" style="color: var(--accent-color);"></i>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ms-auto py-4 py-lg-0">
-          <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://kuru-kuru.ru/">Домашняя страница</a></li>
-          <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://video.kuru-kuru.ru/">KURU-KURU | VIDEO</a></li>
-          <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="https://aha-radio.kuru-kuru.ru/">Министерство Ахахи</a></li>
-          <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#" id="logsysLink">Логи</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://kuru-kuru.ru/">Домашняя страница</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://video.kuru-kuru.ru/">KURU-KURU | VIDEO</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://aha-radio.kuru-kuru.ru/">Министерство Ахахи</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="logsysLink">Логи</a></li>
         </ul>
       </div>
     </div>
@@ -65,203 +77,144 @@
   <!-- Шапка сайта -->
   <header class="masthead" data-aos="fade-in">
     <div class="container position-relative px-4 px-lg-5">
-      <div class="row gx-4 gx-lg-5 justify-content-center">
-        <div class="col-md-10 col-lg-8 col-xl-7">
-          <div class="site-heading text-center">
-            <h3 id="slide-title"></h3>
-            <span id="slide-subtitle" class="subheading"></span>
-          </div>
-        </div>
+      <div class="site-heading text-center glass-panel" style="padding: 40px; display: inline-block; margin-top: 50px;">
+        <h3 id="slide-title"></h3>
+        <span id="slide-subtitle" class="subheading"></span>
       </div>
     </div>
-    <div class="banner-nav">
-      <button id="prev-banner" class="banner-button prev">&#10094;</button>
-      <button id="next-banner" class="banner-button next">&#10095;</button>
+    <div class="banner-nav mt-4 text-center">
+      <button id="prev-banner" class="arrow-button">&#10094;</button>
+      <span id="banner-counter" class="mx-3 font-orbitron" style="color: var(--text-primary);"></span>
+      <button id="next-banner" class="arrow-button">&#10095;</button>
     </div>
-    <div class="banner-counter" id="banner-counter"></div>
   </header>
 
   <!-- Поиск -->
-  <div class="search-bar" data-aos="fade-down">
-    <input type="text" id="search-input" placeholder="Поиск по карточкам..." aria-label="Поиск">
-    <button id="search-button" aria-label="Поиск"><i class="fas fa-search"></i></button>
-    <button class="voice-search-btn" id="voice-search" aria-label="Голосовой поиск"><i class="fas fa-microphone"></i></button>
+  <div class="search-bar glass-panel" data-aos="fade-down">
+    <input type="text" id="search-input" placeholder="Поиск по базе данных..." aria-label="Поиск">
+    <button id="search-button" class="icon-btn"><i class="fas fa-search"></i></button>
+    <button id="voice-search" class="icon-btn"><i class="fas fa-microphone"></i></button>
   </div>
-  
-  <div id="search-results"></div>
+  <div id="search-results" class="container mt-3"></div>
   
   <!-- Приветственное сообщение -->
-  <div class="welcome-message" data-aos="zoom-in">
+  <div class="welcome-message text-center mt-5 mb-5" data-aos="zoom-in">
     <h2>Вы наткнулись на мой сайт? Рад видеть!</h2>
-    <p>Здесь вы найдете всю актуальную (а может нет) информацию о クルシーP</p>
+    <p style="color: var(--text-secondary);">Здесь вы найдете всю актуальную информацию о クルシーP</p>
   </div>
 
-  <!-- Контент секции (Карточки) -->
+  <!-- Контент (Карточки) -->
   <div class="content-section" data-aos="fade-up">
     <!-- Карточка 1: Проекты -->
-    <div class="card" data-aos="flip-left">
-      <i class="fa-solid fa-eye card-icon"></i>
+    <div class="card glass-panel" data-aos="flip-left">
+      <i class="fa-solid fa-code card-icon"></i>
       <h2>Проекты</h2>
-      <div class="toggle-info">
-        <button class="arrow-button" onclick="toggleInfo('project', this)">Показать</button>
+      <div class="toggle-info mt-3">
+        <button class="arrow-button" onclick="toggleInfo('project', this)">Развернуть</button>
         <div class="additional-info" id="projectInfo">
-          <p>На данный момент у меня 3 проекта:</p>
+          <p class="mt-3">Активные проекты:</p>
           <ul>
-            <li>クルシーP переводит</li>
-            <li>KURU-KURU | VIDEO</li>
-            <li>Министерство Ахахи</li>
+            <li>クルシーP переводит (<a href="https://t.me/qlseeh_translations" target="_blank">Telegram</a>)</li>
+            <li>KURU-KURU | VIDEO (<a href="https://kuru-kuru-video.vercel.app/" target="_blank">Vercel</a>)</li>
+            <li>Министерство Ахахи (<a href="https://ministry-ahahi.vercel.app/" target="_blank">Vercel</a>)</li>
           </ul>
-          <p>ТГ канал クルシーP переводит: <a href="https://t.me/qlseeh_translations" target="_blank">https://t.me/qlseeh_translations</a></p>
-          <p>Ссылка на KURU KURU | VIDEO: <a href="https://kuru-kuru-video.vercel.app/" target="_blank">https://kuru-kuru-video.vercel.app/</a></p>
-          <p>Ссылка на Министерство Ахахи: <a href="https://ministry-ahahi.vercel.app/" target="_blank">https://ministry-ahahi.vercel.app/</a></p>
         </div>
       </div>
     </div>
 
     <!-- Карточка 2: Фандомы -->
-    <div class="card" data-aos="flip-left" data-aos-delay="200">
-      <i class="fas fa-heart card-icon"></i>
-      <h2>Фандомы</h2>
-      <div class="toggle-info">
-        <button class="arrow-button" onclick="toggleInfo('fandom', this)">Показать</button>
+    <div class="card glass-panel" data-aos="flip-left" data-aos-delay="150">
+      <i class="fas fa-gamepad card-icon"></i>
+      <h2>Фандомы & Музыка</h2>
+      <div class="toggle-info mt-3">
+        <button class="arrow-button" onclick="toggleInfo('fandom', this)">Развернуть</button>
         <div class="additional-info" id="fandomInfo">
-          <p>Фандомы, проекты, группы Vocaloid'ов/UTAU, японские исполнители и просто исполнители, которые мне нравятся:</p>
+          <p class="mt-3">Игры и аниме:</p>
           <ul>
-            <li>Honkai: Star Rail</li>
-            <li>Zenless Zone Zero</li>
-            <li>Sekai Project</li>
-            <li>Diablo</li>
-            <li>Sky Children of the Light</li>
-            <li>Отель Хазбин</li>
-            <li>Цифровой Цирк</li>
-            <li>Очень странные дела</li>
-            <li>Эхо террора</li>
-            <li>Адский Босс</li>
-            <li>Клинок рассекающий демонов</li>
-            <li>Туалетный мальчик Ханако</li>
-            <li>Евангелион</li>
-            <li>Хроники Эвиллиоса</li>
-            <li>Метал Фемили</li>
-            <li>PinocchioP</li>
-            <li>syudou</li>
-            <li>Ado</li>
-            <li>Kikuo</li>
-            <li>meiyo</li>
-            <li>cosMo＠暴走P</li>
-            <li>biz</li>
-            <li>flower</li>
-            <li>Eve</li>
-            <li>COOL & CREATE</li>
-            <li>Yoh Kamiyama</li>
-            <li>Sasuke Haraguchi</li>
-            <li>jon-YAKITORY</li>
-            <li>Giga</li>
-            <li>Chinozo</li>
-            <li>Jun Togawa</li>
-            <li>Guchiry</li>
-            <li>SLAVE.V-V-R</li>
-            <li>Creepy Nuts</li>
-            <li>Parsley Onuma</li>
-            <li>Kairikibear</li>
-            <li>PEPOYO</li>
-            <li>Akuno_P</li>
-            <li>wowaka</li>
-            <li>Mitchie M</li>
-            <li>Ryo (supercell)</li>
-            <li>MARETU</li>
-            <li>Mafumafu</li>
-            <li>DECO*27</li>
-            <li>Kanaria</li>
-            <li>Данганронпа</li>
-            <li>Hitoshizuku × Yama△</li>
-            <li>Alien Stage</li>
+            <li>Honkai: Star Rail, Zenless Zone Zero, Project Sekai</li>
+            <li>Отель Хазбин, Адский Босс, Цифровой Цирк</li>
+            <li>Евангелион, Эхо террора, Клинок рассекающий демонов</li>
+          </ul>
+          <p>Любимые продюсеры:</p>
+          <ul>
+            <li>PinocchioP, syudou, Ado, Kikuo, DECO*27, wowaka</li>
+            <li>cosMo＠暴走P, MARETU, Kanaria, Giga, Chinozo</li>
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- Карточка 3: Любимые -->
-    <div class="card" data-aos="flip-left" data-aos-delay="400">
+    <!-- Карточка 3: Любимые персонажи -->
+    <div class="card glass-panel" data-aos="flip-left" data-aos-delay="300">
       <i class="fas fa-star card-icon"></i>
-      <h2>Любимые</h2>
-      <div class="toggle-info">
-        <button class="arrow-button" onclick="toggleInfo('hyperfix', this)">Показать</button>
+      <h2>Избранное</h2>
+      <div class="toggle-info mt-3">
+        <button class="arrow-button" onclick="toggleInfo('hyperfix', this)">Развернуть</button>
         <div class="additional-info" id="hyperfixInfo">
-          <p>На данный момент у меня 2 любимых персонажа:</p>
+          <p class="mt-3">Любимые персонажи HSR:</p>
           <ul>
-            <li>Великая Герта, Анакса</li>
+            <li>Великая Герта</li>
+            <li>Анакса</li>
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- Карточка 4: Рандом факт -->
-    <div class="card" data-aos="flip-left" data-aos-delay="600">
-      <i class="fas fa-lightbulb card-icon"></i>
-      <h2>Рандом факт</h2>
-      <p id="fun-fact"></p>
-      <div class="toggle-info"></div>
+    <!-- Карточка 4: Случайный факт -->
+    <div class="card glass-panel" data-aos="flip-left" data-aos-delay="450">
+      <i class="fas fa-terminal card-icon"></i>
+      <h2>Системный факт</h2>
+      <p id="fun-fact" class="mt-3" style="color: var(--text-secondary);"></p>
     </div>
   </div>
 
-  <!-- Музыкальный плеер -->
-  <div class="music-island" id="music-island">
+  <!-- Плавающий Музыкальный плеер -->
+  <div class="music-island glass-panel" id="music-island">
     <audio id="main-audio"></audio>
     <div class="track-info">
-      <span id="player-status">Stopped</span>
-      <div id="current-track-name">Select Track</div>
+      <span id="player-status" style="font-size: 0.8rem; color: var(--accent-color);">Остановлено</span>
+      <div id="current-track-name" class="mt-1" style="font-weight: bold;">Выберите трек</div>
     </div>
-    <div class="controls">
-      <button onclick="prevTrack()" aria-label="Предыдущий трек"><i class="fas fa-backward"></i></button>
-      <button id="play-pause" onclick="togglePlay()" aria-label="Воспроизведение/Пауза"><i class="fas fa-play"></i></button>
-      <button onclick="nextTrack()" aria-label="Следующий трек"><i class="fas fa-forward"></i></button>
-      <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8" oninput="changeVolume(this.value)" aria-label="Громкость">
+    <div class="controls mt-2">
+      <button onclick="prevTrack()" aria-label="Предыдущий"><i class="fas fa-step-backward"></i></button>
+      <button id="play-pause" onclick="togglePlay()" aria-label="Плей/Пауза"><i class="fas fa-play-circle"></i></button>
+      <button onclick="nextTrack()" aria-label="Следующий"><i class="fas fa-step-forward"></i></button>
     </div>
+    <input type="range" id="volume-slider" class="mt-3" min="0" max="1" step="0.01" value="0.5" oninput="changeVolume(this.value)">
   </div>
-
-  <!-- Модальное окно галереи -->
-  <div id="gallery-modal" class="modal">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <img class="modal-content" id="modal-image" alt="Изображение">
-    <div id="modal-caption"></div>
-  </div>
-
-  <!-- Футер -->
-  <footer id="footer">
-    <p>&copy; 2026 クルシーP. Все права принадлежат их правообладателям.</p>
-    <p class="version">Версия сайта: releases-v2.6.0</p>
-    <div class="social-links">
-      <a href="https://t.me/qlseeh_translations" target="_blank" aria-label="Telegram Channel"><i class="fab fa-telegram"></i></a>
-      <a href="#" target="_blank" aria-label="Bluesky"><i class="fa-brands fa-bluesky"></i></a>
-    </div>
-  </footer>
-
-  <!-- Кнопка наверх -->
-  <button id="back-to-top" aria-label="Наверх">
-    <i class="fas fa-arrow-up"></i>
-  </button>
 
   <!-- Окно логов -->
-  <div id="logger-window">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-      <h4>Логи страницы</h4>
-      <button id="close-logger">&times;</button>
+  <div id="logger-window" class="glass-panel" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2" style="border-color: var(--glass-border) !important;">
+      <h4 class="m-0 font-orbitron" style="color: var(--accent-color);">Терминал</h4>
+      <button id="close-logger" class="icon-btn"><i class="fas fa-times"></i></button>
     </div>
-    <div style="margin-bottom: 18px;">
-      <label for="log-level-filter">Фильтр по уровню:</label>
-      <select id="log-level-filter">
-        <option value="all">Все</option>
+    <div class="mb-3">
+      <select id="log-level-filter" class="form-select bg-dark text-light border-secondary">
+        <option value="all">Все логи</option>
         <option value="core">CORE</option>
         <option value="info">INFO</option>
         <option value="warn">WARN</option>
         <option value="error">ERROR</option>
-        <option value="debug">DEBUG</option>
       </select>
     </div>
     <div id="log-content"></div>
   </div>
 
-  <!-- Скрипты -->
+  <!-- Футер -->
+  <footer id="footer" class="text-center mt-5 p-4 glass-panel" style="border-radius: 0; border-left: none; border-right: none; border-bottom: none;">
+    <p>&copy; 2026 クルシーP. Все права защищены.</p>
+    <p class="version" style="color: var(--accent-color); font-family: 'Press Start 2P', cursive; font-size: 0.6rem;">Версия: v3.0 (Cyber-Glassmorphism)</p>
+    <div class="social-links mt-3">
+      <a href="https://t.me/qlseeh_translations" target="_blank" class="mx-2 fs-4" style="color: var(--text-primary);"><i class="fab fa-telegram"></i></a>
+    </div>
+  </footer>
+
+  <!-- Кнопка наверх -->
+  <button id="back-to-top" class="glass-panel" aria-label="Наверх">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
   <script src="main_core.ru.js"></script>
