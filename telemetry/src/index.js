@@ -61,6 +61,9 @@ async function collect(req, env) {
   const width = boundedInt(data.screenWidth, 0, 10000, 0);
   const height = boundedInt(data.screenHeight, 0, 10000, 0);
   const now = new Date().toISOString();
+  const minute = Math.floor(Date.now() / 60000);
+  const throttle = await env.DB.prepare("INSERT INTO rate_limits(wbuid,window_minute,hits) VALUES(?,?,1) ON CONFLICT(wbuid) DO UPDATE SET window_minute=excluded.window_minute,hits=CASE WHEN rate_limits.window_minute=excluded.window_minute THEN rate_limits.hits+1 ELSE 1 END RETURNING hits").bind(data.wbuid, minute).first();
+  if ((throttle?.hits || 0) > 30) return json({ error: "rate_limited" }, 429, { "Retry-After": "60" });
   let detail = {};
   if (data.type === "js_error") {
     detail = { message: typeof data.message === "string" ? data.message.slice(0, 180).replace(/[\r\n\t]/g, " ") : "unknown" };
