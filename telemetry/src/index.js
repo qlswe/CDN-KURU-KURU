@@ -17,7 +17,7 @@ function json(data, status = 200, headers = {}) {
 }
 function validOrigin(req) {
   const origin = req.headers.get("Origin");
-  return origin === ORIGIN || origin === null;
+  return origin === ORIGIN;
 }
 function safePage(value) {
   if (typeof value !== "string") return "/";
@@ -106,7 +106,9 @@ export default {
         if (!validOrigin(request)) return json({ error: "origin_denied" }, 403);
         const data = await parseBody(request);
         if (typeof data.wbuid !== "string" || !UUID_RE.test(data.wbuid)) return json({ error: "invalid_wbuid" }, 400);
+        await env.DB.prepare("DELETE FROM events WHERE wbuid=?").bind(data.wbuid).run();
         await env.DB.prepare("DELETE FROM visitors WHERE wbuid=?").bind(data.wbuid).run();
+        await env.DB.prepare("DELETE FROM rate_limits WHERE wbuid=?").bind(data.wbuid).run();
         return json({ ok: true });
       }
       if (url.pathname.startsWith("/api/telemetry/admin/")) return await admin(request, env, url);
@@ -119,5 +121,6 @@ export default {
   async scheduled(_event, env, ctx) {
     ctx.waitUntil(env.DB.prepare("DELETE FROM events WHERE created_at < datetime('now','-90 days')").run());
     ctx.waitUntil(env.DB.prepare("DELETE FROM visitors WHERE last_seen < datetime('now','-90 days')").run());
+    ctx.waitUntil(env.DB.prepare("DELETE FROM rate_limits WHERE window_minute < (strftime('%s','now') / 60) - 1440").run());
   }
 };
