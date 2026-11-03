@@ -40,7 +40,7 @@
       if (choice === "yes") { send("page_view"); setTimeout(() => send("performance", {loadMs:Math.min(Math.round(performance.now()),120000)}), 0); }
     });
   }
-  window.addEventListener("DOMContentLoaded", banner, {once:true});
+  window.addEventListener("DOMContentLoaded", () => { banner(); if (localStorage.getItem(KEY) === "accepted") { send("page_view"); setTimeout(() => send("performance", {loadMs:Math.min(Math.round(performance.now()),120000)}), 0); } }, {once:true});
   window.addEventListener("hashchange", () => send("section_view"));
   window.addEventListener("error", (e) => send("js_error", {message:String(e.message || "script error").slice(0,180)}));
   window.addEventListener("unhandledrejection", (e) => send("js_error", {message:String(e.reason || "promise rejection").slice(0,180)}));
