@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kuru Telemetry</title><link rel="stylesheet" href="dashboard.css"></head>
+<body><main class="shell"><header><div><p class="eyebrow">KURU / PRIVATE TOOLS</p><h1>Telemetry</h1><p class="muted">Статистика сайта · последние 90 дней</p></div><button id="refresh">Обновить</button></header>
+<section class="metrics"><article><span>Посетители</span><strong id="visitors">—</strong></article><article><span>События за 30 дней</span><strong id="events">—</strong></article><article><span>Устройства</span><strong id="devices">—</strong></article></section>
+<section class="panel"><h2>Последние WBUID</h2><div class="table-wrap"><table><thead><tr><th>WBUID</th><th>Устройство</th><th>Язык</th><th>Последняя активность</th></tr></thead><tbody id="visitor-rows"><tr><td colspan="4">Загрузка…</td></tr></tbody></table></div></section>
+<section class="panel"><h2>Последние события</h2><div class="table-wrap"><table><thead><tr><th>Время</th><th>WBUID</th><th>Тип</th><th>Страница</th><th>Детали</th></tr></thead><tbody id="event-rows"><tr><td colspan="5">Загрузка…</td></tr></tbody></table></div></section>
+<p id="status" class="muted" role="status"></p></main><script src="dashboard.js"></script></body></html>
