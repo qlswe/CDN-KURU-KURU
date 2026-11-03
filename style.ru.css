@@ -40,12 +40,17 @@ button,input,select{font:inherit}
 .navbar-nav .nav-link:hover{background:rgba(165,121,247,.12);color:white!important;transform:none;box-shadow:none}
 .navbar-toggler{border:1px solid var(--border-color);border-radius:10px;padding:8px;box-shadow:none!important}
 .navbar-toggler-icon{width:24px;height:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23c5a5ff' stroke-linecap='round' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E")}
-.masthead{min-height:clamp(480px,68vh,720px);height:auto;margin:0 auto 50px;display:flex;align-items:center;justify-content:center;padding:70px 20px 90px;overflow:hidden;background:radial-gradient(ellipse at center,rgba(117,65,190,.12),transparent 60%)}
-.masthead>.container{width:100%;max-width:1100px}
-.site-heading{max-width:900px;width:100%;margin:auto;padding:clamp(28px,5vw,64px);text-align:left;border-radius:28px;background:linear-gradient(145deg,rgba(30,18,55,.82),rgba(15,9,31,.72));border:1px solid rgba(190,157,255,.2);backdrop-filter:blur(22px);box-shadow:0 30px 100px rgba(0,0,0,.24);animation:none}
-.site-heading::before{content:"PERSONAL SPACE  /  クルシーP";display:block;color:#b99aff;font-size:.72rem;font-weight:800;letter-spacing:.19em;margin-bottom:24px}
-.site-heading h3{font:700 clamp(2rem,6vw,4.5rem)/1.16 var(--font-pixel);letter-spacing:-.045em;color:#f7f1ff;text-shadow:none;animation:none;margin:0 0 18px;overflow-wrap:anywhere}
-.site-heading .subheading{display:block;width:auto;white-space:normal;border:0;color:#c5b8dc;font:500 clamp(1rem,2.2vw,1.25rem)/1.7 var(--font-secondary);animation:none;overflow:visible}
+.masthead{position:relative;min-height:clamp(480px,72vh,760px);height:auto;margin:0 auto 28px;display:flex;align-items:center;justify-content:center;padding:70px 20px 90px;overflow:hidden;background:radial-gradient(ellipse at 72% 35%,rgba(119,66,205,.24),transparent 34%),radial-gradient(ellipse at 20% 75%,rgba(240,64,209,.07),transparent 35%)}
+.masthead>.container{width:100%;max-width:1180px}
+.masthead .row{justify-content:flex-start!important}
+.masthead .row>div{width:100%;max-width:100%;flex:0 0 100%}
+.site-heading{position:relative;isolation:isolate;max-width:1120px;width:100%;min-height:390px;margin:auto;padding:clamp(32px,6vw,76px);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;border-radius:4px;background:linear-gradient(110deg,rgba(12,6,22,.97) 0%,rgba(18,9,34,.91) 54%,rgba(48,22,78,.66) 100%);border:1px solid rgba(190,157,255,.12);backdrop-filter:blur(22px);box-shadow:0 30px 100px rgba(0,0,0,.28);animation:none;overflow:hidden}
+.site-heading::before{content:"クルーシP  /  PERSONAL PORTFOLIO";display:block;color:#b99aff;font-size:.7rem;font-weight:800;letter-spacing:.2em;margin-bottom:26px}
+.site-heading::after{content:"クルーシP";position:absolute;z-index:-1;right:4%;top:50%;transform:translateY(-50%) rotate(-8deg);font:700 clamp(3rem,10vw,9rem) var(--font-pixel);letter-spacing:-.08em;color:rgba(192,157,255,.055);white-space:nowrap}
+.site-heading h3{position:relative;max-width:680px;font:800 clamp(2.2rem,6.5vw,5.2rem)/1.08 var(--font-main);letter-spacing:-.065em;color:#f7f1ff;text-shadow:none;animation:none;margin:0 0 20px;overflow-wrap:anywhere}
+.site-heading h3 span,.site-heading h3 strong{color:#b58aff}
+.site-heading .subheading{position:relative;display:block;max-width:540px;width:auto;white-space:normal;border:0;color:#c5b8dc;font:500 clamp(.95rem,1.7vw,1.15rem)/1.8 var(--font-secondary);animation:none;overflow:visible}
+
 .banner-nav{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
 .banner-button{width:42px;height:42px;border:1px solid rgba(190,157,255,.25);border-radius:50%;background:rgba(25,15,45,.7);color:#e8dcff;transition:.2s}
 .banner-button:hover{background:rgba(165,121,247,.2);transform:translateY(-2px)}
