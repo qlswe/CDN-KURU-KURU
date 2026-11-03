@@ -19,3 +19,5 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at);
 CREATE INDEX IF NOT EXISTS idx_events_wbuid ON events(wbuid);
+
+CREATE TABLE IF NOT EXISTS rate_limits (wbuid TEXT PRIMARY KEY, window_minute INTEGER NOT NULL, hits INTEGER NOT NULL DEFAULT 0);
