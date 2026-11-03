@@ -2,6 +2,9 @@ name = "kuru-telemetry"
 main = "src/index.js"
 compatibility_date = "2026-11-03"
 compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+crons = ["17 3 * * *"]
 workers_dev = false
 
 # Attach this Worker to kuru-kuru.ru/api/telemetry/*
