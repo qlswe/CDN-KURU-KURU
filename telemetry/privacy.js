@@ -1,0 +1,1 @@
+document.getElementById("revoke").addEventListener("click",async()=>{await window.kuruTelemetry?.revoke?.();document.getElementById("result").textContent="Согласие отозвано. Локальный идентификатор удалён; запрос на удаление отправлен."});
