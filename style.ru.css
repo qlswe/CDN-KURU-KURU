@@ -125,3 +125,57 @@ dialog::backdrop{animation:backdrop-in .25s ease both}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+
+/* cohesive portfolio refresh */
+:root{--surface:#100c17;--surface2:#17111f;--line:rgba(202,177,235,.16);--card:#100d16}
+.eyebrow i,.card-top .online,.profile-emblem span,.float-tag,.art-index{display:none!important}
+.hero-art{min-width:0}
+.profile-card.carousel-card{width:min(370px,88%);padding:20px 22px 16px;transform:none;border-radius:25px;background:linear-gradient(150deg,#17121f 0%,#100d16 72%);border:1px solid rgba(198,172,229,.18);box-shadow:0 28px 70px #0005;overflow:hidden}
+.carousel-track{position:relative;min-height:370px}
+.carousel-slide{display:none;animation:slide-in .42s cubic-bezier(.2,.75,.25,1) both}
+.carousel-slide.is-active{display:block}
+.slide-kicker{font:600 9px var(--display);letter-spacing:.17em;color:#9585a7;margin:2px 0 15px}
+.logo-stage{height:205px;margin:0 0 18px;background:radial-gradient(ellipse at 50% 45%,#292033,#14101a 72%);border:1px solid rgba(198,172,229,.08)}
+.profile-emblem{font:700 132px/1 var(--display);color:#c5a5ec;text-shadow:0 0 38px #a77af522;letter-spacing:-.12em}
+.carousel-slide h2{font:700 24px var(--display);margin:0 0 5px;letter-spacing:-.04em}
+.carousel-slide p{color:var(--muted);font-size:12px;line-height:1.6;margin:0 0 16px;min-height:38px}
+.carousel-slide>a{font-size:11px;color:#c7a9ed}
+.slide-visual{height:205px;margin-bottom:18px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;background:radial-gradient(ellipse at center,#282033,#141019 72%);border:1px solid rgba(198,172,229,.08)}
+.slide-visual i{font-size:54px;color:#c5a5ec}
+.slide-visual strong{font:700 24px var(--display);letter-spacing:-.05em;color:#ded3ea}
+.carousel-controls{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:13px;margin-top:14px}
+.carousel-controls>button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#191321;color:#d9c8eb;transition:background .2s,transform .2s}
+.carousel-controls>button:hover{background:#30233c;transform:translateY(-2px)}
+.carousel-dots{display:flex;gap:7px}
+.carousel-dots button{width:6px;height:6px;border:0;border-radius:50%;padding:0;background:#51465c;transition:all .25s}
+.carousel-dots button.is-active{width:22px;border-radius:8px;background:#b995e8}
+@keyframes slide-in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.language-toggle{border:1px solid var(--line);border-radius:99px;background:#17111f;color:#d9c8eb;padding:9px 13px;font:700 10px var(--font);letter-spacing:.08em;transition:.2s}
+.language-toggle:hover{background:#2a2035;border-color:#a77af566}
+.interest-groups{display:grid;gap:28px}
+.interest-group h3{font:700 15px var(--display);color:#e7def1;margin:0 0 14px}
+.tags{gap:9px}
+.tag{background:#100d16;border-color:rgba(202,177,235,.14);padding:9px 14px;font-size:12px}
+.tag:hover{background:#1c1724;border-color:#9276b5}
+.project{background:#100d16;border-color:rgba(202,177,235,.14)}
+.project-art{filter:saturate(.62)}
+.project:hover{border-color:#9276b555}
+.header{z-index:100}
+@media(max-width:850px){.header nav{gap:15px}.language-toggle{margin-left:4px}}
+@media(max-width:620px){
+ .header{width:100%;padding:0 18px}
+ .header nav{display:flex!important;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:4px;margin:0;padding:0 20px;max-height:0;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(-9px);background:rgba(15,11,21,.98);border-bottom:1px solid transparent;box-shadow:0 18px 35px #0008;transition:max-height .35s ease,opacity .25s ease,transform .3s ease,padding .3s ease,visibility .3s}
+ .header nav.open{max-height:390px;padding:14px 20px 20px;opacity:1;visibility:visible;transform:translateY(0);border-bottom-color:var(--line)}
+ .header nav a,.header nav.open a{min-height:44px;padding:10px 8px!important;width:100%;font-size:14px}
+ .header nav .nav-cta{margin-top:5px;justify-content:center}
+ .language-toggle{align-self:flex-start;margin:8px 0 0 6px}
+ .hero-art{min-height:430px;overflow:visible}
+ .profile-card.carousel-card{width:min(340px,90%);padding:17px}
+ .carousel-track{min-height:350px}
+ .logo-stage,.slide-visual{height:185px}
+ .profile-emblem{font-size:118px}
+ .carousel-slide h2{font-size:22px}
+ .interest-groups{gap:25px}
+}
+@media(prefers-reduced-motion:reduce){.carousel-slide,.project{animation:none!important;transition:none!important}}
