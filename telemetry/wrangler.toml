@@ -7,6 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 crons = ["17 3 * * *"]
 workers_dev = false
 
+[[routes]]
+pattern = "kuru-kuru.ru/api/telemetry/*"
+zone_name = "kuru-kuru.ru"
+
 # Attach this Worker to kuru-kuru.ru/api/telemetry/*
 # Create the D1 database, then replace database_id below.
 [[d1_databases]]
