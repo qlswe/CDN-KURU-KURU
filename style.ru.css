@@ -198,3 +198,9 @@ dialog::backdrop{animation:backdrop-in .25s ease both}
 
 /* Language selector and improved brand mark */
 .language-picker{position:relative;margin-left:auto;margin-right:20px;flex:0 0 auto}.language-trigger{display:flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(24,16,33,.8);color:#e8dcfa;font-size:11px;font-weight:800}.language-trigger:hover{border-color:rgba(201,174,255,.45)}.language-menu{position:absolute;z-index:60;right:0;top:calc(100% + 9px);min-width:140px;padding:6px;border:1px solid rgba(201,174,255,.2);border-radius:13px;background:rgba(20,13,29,.98);box-shadow:0 16px 40px #0008;backdrop-filter:blur(18px)}.language-menu[hidden]{display:none}.language-menu button{display:block;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#d9cce9;text-align:left;font-size:12px}.language-menu button:hover{background:#a77af522;color:#fff}.brand-icon img{display:block;filter:drop-shadow(0 0 9px #a77af566)}@media(max-width:620px){.language-picker{margin-right:8px}.language-trigger{padding:9px 10px}#menu-toggle{flex:0 0 44px}}
+
+/* Shared language picker icon */
+.language-globe{display:block;width:16px;height:16px;flex:0 0 16px;color:currentColor}
+.language-trigger{display:flex;align-items:center;gap:8px}
+.language-chevron{font-size:13px;color:#bda5d7;transition:transform .18s}
+.language-trigger[aria-expanded="true"] .language-chevron{transform:rotate(180deg)}
