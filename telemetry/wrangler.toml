@@ -15,14 +15,3 @@ zone_name = "kuru-kuru.ru"
 binding = "DB"
 database_name = "kuru-telemetry"
 database_id = "f1efe8bd-7871-42a7-8792-8ef9de768089"
-
-# Optional Cloudflare Rate Limiting binding. Create a namespace and replace the ID.
-# [[unsafe.bindings]]
-# name = "RATE_LIMIT"
-# type = "ratelimit"
-# namespace_id = "REPLACE_WITH_RATE_LIMIT_NAMESPACE_ID"
-# simple = { limit = 60, period = 60 }
-
-[vars]
-ACCESS_TEAM_DOMAIN = "REPLACE_WITH_TEAM.cloudflareaccess.com"
-ACCESS_AUD = "REPLACE_WITH_CLOUDFLARE_ACCESS_APPLICATION_AUD"
