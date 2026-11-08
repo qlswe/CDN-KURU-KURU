@@ -33,7 +33,9 @@ function safeTechProfile(data,cf) {
     webgl:{version:glVersion, maxTextureSize:boundedInt(webgl.maxTextureSize,0,32768,0), extensionsCount:boundedInt(webgl.extensionsCount,0,256,0)},
     network:{effectiveType, saveData:network.saveData===true},
     country:typeof cf?.country==="string"?cf.country.slice(0,2):"unknown",
-    region:typeof cf?.regionCode==="string"?cf.regionCode.slice(0,8):"unknown"
+    region:typeof cf?.regionCode==="string"?cf.regionCode.slice(0,8):"unknown",
+    asn:boundedInt(cf?.asn,0,4294967295,0),
+    colo:typeof cf?.colo==="string"?cf.colo.slice(0,8):"unknown"
   };
 }
 async function recordConsent(req,env) {
@@ -60,7 +62,7 @@ async function collect(req,env) {
   if((throttle?.hits||0)>30)return json({error:"rate_limited"},429,{"Retry-After":"60"});
   let detail={};
   if(data.type==="js_error")detail={message:typeof data.message==="string"?data.message.slice(0,180).replace(/[\r\n\t]/g," "):"unknown"};
-  if(data.type==="performance")detail={loadMs:boundedInt(data.loadMs,0,120000,0),...safeTechProfile(data,req.cf)};
+  if(data.type==="performance")detail={loadMs:boundedInt(data.loadMs,0,120000,0),screenWidth:boundedInt(data.screenWidth,0,10000,0),screenHeight:boundedInt(data.screenHeight,0,10000,0),...safeTechProfile(data,req.cf)};
   await db.prepare("INSERT INTO visitors(wbuid,created_at,last_seen,device,language,screen_width,screen_height,consent_version) VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(wbuid) DO UPDATE SET last_seen=excluded.last_seen,device=excluded.device,language=excluded.language,screen_width=excluded.screen_width,screen_height=excluded.screen_height").bind(data.wbuid,now,now,device,language,width,height,CONSENT_VERSION).run();
   await db.prepare("INSERT INTO events(wbuid,event_type,page,created_at,detail) VALUES(?,?,?,?,?)").bind(data.wbuid,data.type,page,now,JSON.stringify(detail)).run();
   return json({ok:true});
