@@ -106,17 +106,20 @@ async function admin(req,env,url) {
   const db=env["kuru-kuru"];
   if(url.pathname.endsWith("/summary")) {
     await db.prepare("CREATE TABLE IF NOT EXISTS consent_metrics (day TEXT NOT NULL, decision TEXT NOT NULL, version TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, PRIMARY KEY(day,decision,version))").run();
-    const [totals,daily,devices,recent,eventCount,consentTotals,consentDaily]=await Promise.all([
+    const [totals,daily,devices,recent,eventCount,consentTotals,consentDaily,browsers,operatingSystems,countries]=await Promise.all([
       db.prepare("SELECT COUNT(*) visitors FROM visitors").first(),
       db.prepare("SELECT substr(created_at,1,10) day,COUNT(*) events FROM events WHERE created_at>=datetime('now','-30 days') GROUP BY day ORDER BY day").all(),
       db.prepare("SELECT device,COUNT(*) count FROM visitors GROUP BY device").all(),
       db.prepare("SELECT wbuid,created_at,last_seen,device,language FROM visitors ORDER BY last_seen DESC LIMIT 100").all(),
       db.prepare("SELECT COUNT(*) count FROM events WHERE created_at>=datetime('now','-30 days')").first(),
       db.prepare("SELECT decision,SUM(count) count FROM consent_metrics WHERE version=? GROUP BY decision").bind(CONSENT_VERSION).all(),
-      db.prepare("SELECT day,decision,count FROM consent_metrics WHERE version=? AND day>=date('now','-30 days') ORDER BY day").bind(CONSENT_VERSION).all()
+      db.prepare("SELECT day,decision,count FROM consent_metrics WHERE version=? AND day>=date('now','-30 days') ORDER BY day").bind(CONSENT_VERSION).all(),
+      db.prepare("SELECT json_extract(detail,'$.browser') name,COUNT(DISTINCT wbuid) count FROM events WHERE event_type='performance' AND created_at>=datetime('now','-90 days') AND json_valid(detail) AND json_extract(detail,'$.browser') IS NOT NULL GROUP BY name ORDER BY count DESC").all(),
+      db.prepare("SELECT json_extract(detail,'$.os') name,COUNT(DISTINCT wbuid) count FROM events WHERE event_type='performance' AND created_at>=datetime('now','-90 days') AND json_valid(detail) AND json_extract(detail,'$.os') IS NOT NULL GROUP BY name ORDER BY count DESC").all(),
+      db.prepare("SELECT json_extract(detail,'$.country') name,COUNT(DISTINCT wbuid) count FROM events WHERE event_type='performance' AND created_at>=datetime('now','-90 days') AND json_valid(detail) AND json_extract(detail,'$.country') IS NOT NULL AND json_extract(detail,'$.country')!='unknown' GROUP BY name ORDER BY count DESC").all()
     ]);
     const choices=Object.fromEntries((consentTotals.results||[]).map(x=>[x.decision,x.count]));
-    return json({visitors:totals?.visitors||0,events30d:eventCount?.count||0,daily:daily.results||[],devices:devices.results||[],recent:recent.results||[],consent:{accepted:choices.accepted||0,declined:choices.declined||0,daily:consentDaily.results||[]}});
+    return json({visitors:totals?.visitors||0,events30d:eventCount?.count||0,daily:daily.results||[],devices:devices.results||[],recent:recent.results||[],consent:{accepted:choices.accepted||0,declined:choices.declined||0,daily:consentDaily.results||[]},browsers:browsers.results||[],operatingSystems:operatingSystems.results||[],countries:countries.results||[]});
   }
   if(url.pathname.endsWith("/events")) { const rows=await db.prepare("SELECT event_type,page,created_at,detail,wbuid FROM events ORDER BY id DESC LIMIT 200").all();return json({events:rows.results||[]}); }
   return json({error:"not_found"},404);
