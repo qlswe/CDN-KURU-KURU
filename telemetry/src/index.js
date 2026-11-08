@@ -38,8 +38,28 @@ function safeTechProfile(data,cf) {
     colo:typeof cf?.colo==="string"?cf.colo.slice(0,8):"unknown"
   };
 }
+function automatedUserAgent(req) {
+  const ua=req.headers.get("User-Agent")||"";
+  if(!ua.trim())return true;
+  return /(?:bot|crawler|spider|scraper|headless|phantomjs|selenium|playwright|puppeteer|python-requests|python-urllib|scrapy|httpx|aiohttp|curl|wget|go-http-client|libwww-perl)/i.test(ua);
+}
+async function blockedAutomatedRequest(req,env) {
+  const bot=req.cf?.botManagement;
+  if(bot?.verifiedBot===true)return false;
+  if(bot&&Number.isFinite(bot.score)&&bot.score<=10)return true;
+  if(automatedUserAgent(req))return true;
+  const ip=req.headers.get("CF-Connecting-IP");
+  if(!ip||!env.COOKIE_SECRET||env.COOKIE_SECRET.length<32)return false;
+  const db=env["kuru-kuru"];
+  await db.prepare("CREATE TABLE IF NOT EXISTS ip_rate_limits (ip_hash TEXT PRIMARY KEY, window_minute INTEGER NOT NULL, hits INTEGER NOT NULL DEFAULT 0)").run();
+  const ipHash=await sign(ip,env.COOKIE_SECRET);
+  const minute=Math.floor(Date.now()/60000);
+  const row=await db.prepare("INSERT INTO ip_rate_limits(ip_hash,window_minute,hits) VALUES(?,?,1) ON CONFLICT(ip_hash) DO UPDATE SET window_minute=excluded.window_minute,hits=CASE WHEN ip_rate_limits.window_minute=excluded.window_minute THEN ip_rate_limits.hits+1 ELSE 1 END RETURNING hits").bind(ipHash,minute).first();
+  return (row?.hits||0)>90;
+}
 async function recordConsent(req,env) {
   if(!validOrigin(req))return json({error:"origin_denied"},403);
+  if(await blockedAutomatedRequest(req,env))return json({error:"automated_traffic_blocked"},403);
   const data=await parseBody(req);
   if(data.version!==CONSENT_VERSION||!["accepted","declined"].includes(data.decision))return json({error:"invalid_consent_choice"},400);
   const db=env["kuru-kuru"];
@@ -50,6 +70,7 @@ async function recordConsent(req,env) {
 }
 async function collect(req,env) {
   if(!validOrigin(req))return json({error:"origin_denied"},403);
+  if(await blockedAutomatedRequest(req,env))return json({error:"automated_traffic_blocked"},403);
   const data=await parseBody(req);
   if(data.consent!==true||data.consentVersion!==CONSENT_VERSION)return json({error:"consent_required"},400);
   if(typeof data.wbuid!=="string"||!UUID_RE.test(data.wbuid))return json({error:"invalid_wbuid"},400);
@@ -127,5 +148,6 @@ export default {
     ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM events WHERE created_at<datetime('now','-90 days')").run());
     ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM visitors WHERE last_seen<datetime('now','-90 days')").run());
     ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM rate_limits WHERE window_minute<(strftime('%s','now')/60)-1440").run());
+    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM ip_rate_limits WHERE window_minute<(strftime('%s','now')/60)-1440").run());
   }
 };
