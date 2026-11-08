@@ -91,11 +91,11 @@ async function admin(req, env, url) {
     const data = await parseBody(req);
     if (typeof data.password !== "string" || data.password.length > 256 || data.password !== env.TELEMETRY_ADMIN_PASSWORD) return json({ error: "invalid_credentials" }, 401);
     const token = await createSession(env.COOKIE_SECRET);
-    return json({ ok: true }, 200, { "Set-Cookie": SESSION_COOKIE + "=" + token + "; Max-Age=" + SESSION_TTL + "; Path=/api/telemetry/admin; HttpOnly; Secure; SameSite=Strict" });
+    return json({ ok: true }, 200, { "Set-Cookie": SESSION_COOKIE + "=" + token + "; Max-Age=" + SESSION_TTL + "; Path=/; HttpOnly; Secure; SameSite=Strict" });
   }
   if (url.pathname === "/api/telemetry/admin/logout" && req.method === "POST") {
     if (!validOrigin(req)) return json({ error: "origin_denied" }, 403);
-    return json({ ok: true }, 200, { "Set-Cookie": SESSION_COOKIE + "=; Max-Age=0; Path=/api/telemetry/admin; HttpOnly; Secure; SameSite=Strict" });
+    return json({ ok: true }, 200, { "Set-Cookie": SESSION_COOKIE + "=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict" });
   }
   if (!(await validSession(req, env))) return json({ error: "unauthorized" }, 401);
   if (req.method !== "GET") return json({ error: "method_not_allowed" }, 405);
