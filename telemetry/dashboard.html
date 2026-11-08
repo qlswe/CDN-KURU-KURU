@@ -1,7 +1,42 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kuru Telemetry</title><link rel="stylesheet" href="dashboard.css"></head>
-<body><main class="shell"><header><div><p class="eyebrow">KURU / PRIVATE TOOLS</p><h1>Telemetry</h1><p class="muted">Статистика сайта · последние 90 дней</p></div><div><button id="refresh">Обновить</button> <button id="logout" type="button">Выйти</button></div></header>
-<section class="metrics"><article><span>Посетители</span><strong id="visitors">—</strong></article><article><span>События за 30 дней</span><strong id="events">—</strong></article><article><span>Устройства</span><strong id="devices">—</strong></article></section>
-<section class="panel"><h2>Последние WBUID</h2><div class="table-wrap"><table><thead><tr><th>WBUID</th><th>Устройство</th><th>Язык</th><th>Последняя активность</th></tr></thead><tbody id="visitor-rows"><tr><td colspan="4">Загрузка…</td></tr></tbody></table></div></section>
-<section class="panel"><h2>Последние события</h2><div class="table-wrap"><table><thead><tr><th>Время</th><th>WBUID</th><th>Тип</th><th>Страница</th><th>Детали</th></tr></thead><tbody id="event-rows"><tr><td colspan="5">Загрузка…</td></tr></tbody></table></div></section>
-<p id="status" class="muted" role="status"></p></main><script src="dashboard.js"></script></body></html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Kuru Telemetry</title>
+<link rel="stylesheet" href="dashboard.css?v=2">
+</head>
+<body>
+<main class="shell">
+<header class="topbar">
+  <div><p class="eyebrow">KURU / PRIVATE TOOLS</p><h1>Telemetry</h1><p class="muted">Аналитика сайта · хранение данных до 90 дней</p></div>
+  <div class="header-actions"><button id="refresh" type="button">Обновить</button><button id="logout" class="button-secondary" type="button">Выйти</button></div>
+</header>
+<section class="metrics">
+  <article><span>Посетители</span><strong id="visitors">—</strong><small>за всё время хранения</small></article>
+  <article><span>События</span><strong id="events">—</strong><small>за последние 30 дней</small></article>
+  <article><span>Устройства</span><strong id="device-total">—</strong><small id="devices">—</small></article>
+</section>
+<section class="panel">
+  <div class="section-heading"><div><p class="eyebrow">AUDIENCE</p><h2>Сводка по посетителям</h2></div></div>
+  <div class="summary-grid">
+    <article class="summary-card"><h3>Браузеры</h3><div id="browser-breakdown" class="breakdown"><p class="empty">Нет данных</p></div></article>
+    <article class="summary-card"><h3>Операционные системы</h3><div id="os-breakdown" class="breakdown"><p class="empty">Нет данных</p></div></article>
+    <article class="summary-card"><h3>Страны</h3><div id="country-breakdown" class="breakdown"><p class="empty">Нет данных</p></div></article>
+  </div>
+</section>
+<section class="panel">
+  <div class="section-heading"><div><p class="eyebrow">VISITORS</p><h2>Последние посетители</h2></div><span class="section-note">До 100 записей</span></div>
+  <div class="table-wrap"><table><thead><tr><th>WBUID</th><th>Устройство</th><th>Язык</th><th>Последняя активность</th></tr></thead><tbody id="visitor-rows"><tr><td colspan="4">Загрузка…</td></tr></tbody></table></div>
+</section>
+<section class="panel">
+  <div class="section-heading"><div><p class="eyebrow">DEVICE PROFILE</p><h2>Технические профили</h2></div><span class="section-note">Последние отправленные данные</span></div>
+  <div id="profile-list" class="profile-list"><p class="empty">Загрузка…</p></div>
+</section>
+<section class="panel">
+  <div class="section-heading"><div><p class="eyebrow">ACTIVITY</p><h2>Последние события</h2></div><label class="filter-label">Тип события <select id="event-filter"><option value="all">Все</option><option value="page_view">Просмотр страницы</option><option value="section_view">Просмотр раздела</option><option value="performance">Технический профиль</option><option value="js_error">Ошибка JavaScript</option></select></label></div>
+  <div class="table-wrap"><table class="events-table"><thead><tr><th>Время</th><th>Посетитель</th><th>Событие</th><th>Страница</th><th>Подробности</th></tr></thead><tbody id="event-rows"><tr><td colspan="5">Загрузка…</td></tr></tbody></table></div>
+</section>
+<p id="status" class="status-line" role="status">Подключение…</p>
+<footer class="dashboard-footer"><a href="/privacy.html" target="_blank" rel="noopener">Политика конфиденциальности</a><span> Kuru Telemetry · private dashboard</span></footer>
+</main><script src="dashboard.js?v=2"></script>
+</body></html>
