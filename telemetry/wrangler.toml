@@ -12,6 +12,6 @@ pattern = "kuru-kuru.ru/api/telemetry/*"
 zone_name = "kuru-kuru.ru"
 
 [[d1_databases]]
-binding = "DB"
+binding = "kuru-kuru"
 database_name = "kuru-telemetry"
 database_id = "f1efe8bd-7871-42a7-8792-8ef9de768089"
