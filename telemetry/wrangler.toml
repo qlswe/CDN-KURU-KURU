@@ -11,12 +11,10 @@ workers_dev = false
 pattern = "kuru-kuru.ru/api/telemetry/*"
 zone_name = "kuru-kuru.ru"
 
-# Attach this Worker to kuru-kuru.ru/api/telemetry/*
-# Create the D1 database, then replace database_id below.
 [[d1_databases]]
 binding = "DB"
 database_name = "kuru-telemetry"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "f1efe8bd-7871-42a7-8792-8ef9de768089"
 
 # Optional Cloudflare Rate Limiting binding. Create a namespace and replace the ID.
 # [[unsafe.bindings]]
