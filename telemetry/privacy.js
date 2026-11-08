@@ -1,21 +1,4 @@
-const revokeButton=document.getElementById("revoke");
-if(revokeButton){
-  revokeButton.addEventListener("click",async()=>{
-    const result=document.getElementById("result");
-    revokeButton.disabled=true;
-    result.textContent="Sending deletion request…";
-    try{
-      const response=await window.kuruTelemetry?.revoke?.();
-      if(response?.removed){
-        result.textContent="Consent withdrawn. The server confirmed deletion of the data associated with this browser.";
-        console.info("[Kuru Telemetry] Deletion request completed successfully");
-      }else{
-        result.textContent="Consent was withdrawn locally, but the server did not confirm deletion. Please try again later.";
-        console.warn("[Kuru Telemetry] The server did not confirm data deletion");
-      }
-    }catch(error){
-      result.textContent="The request could not be completed. Check your connection and try again.";
-      console.error("[Kuru Telemetry] Consent withdrawal failed",String(error));
-    }finally{revokeButton.disabled=false;}
-  });
-}
+const revokeButton=document.getElementById("revoke");const policyWords={en:{sending:"Sending deletion request…",success:"Consent withdrawn. The server confirmed deletion of the data associated with this browser.",partial:"Consent was withdrawn locally, but the server did not confirm deletion. Please try again later.",failed:"The request could not be completed. Check your connection and try again.",button:"Withdraw consent and delete my data"},ru:{sending:"Отправляем запрос на удаление…",success:"Согласие отозвано. Сервер подтвердил удаление данных, связанных с этим браузером.",partial:"Согласие отозвано локально, но сервер не подтвердил удаление. Попробуйте позже.",failed:"Не удалось выполнить запрос. Проверьте подключение и повторите попытку.",button:"Отозвать согласие и удалить мои данные"}};
+function applyPolicyLanguage(lang){lang=lang==="ru"?"ru":"en";const t=policyWords[lang];const button=document.getElementById("policy-language");if(button)button.textContent=lang==="ru"?"RU · EN":"EN · RU";if(revokeButton)revokeButton.textContent=t.button;const home=document.getElementById("policy-home");if(home)home.textContent=lang==="ru"?"← На главную":"← Back to home";document.documentElement.lang=lang;localStorage.setItem("kuru-language",lang);document.querySelectorAll("[data-policy-en]").forEach(el=>el.textContent=el.getAttribute("data-policy-"+lang));}
+let policyLang=localStorage.getItem("kuru-language")||"en";applyPolicyLanguage(policyLang);document.getElementById("policy-language")?.addEventListener("click",()=>{policyLang=policyLang==="ru"?"en":"ru";applyPolicyLanguage(policyLang);});
+if(revokeButton){revokeButton.addEventListener("click",async()=>{const result=document.getElementById("result"),t=policyWords[policyLang];revokeButton.disabled=true;result.textContent=t.sending;try{const response=await window.kuruTelemetry?.revoke?.();if(response?.removed){result.textContent=t.success;console.info("[Kuru Telemetry] Deletion request completed successfully");}else{result.textContent=t.partial;console.warn("[Kuru Telemetry] The server did not confirm data deletion");}}catch(error){result.textContent=t.failed;console.error("[Kuru Telemetry] Consent withdrawal failed",String(error));}finally{revokeButton.disabled=false;}});}
