@@ -33,3 +33,16 @@ select option{background:#17111f;color:#f5efff}
 .language-picker{position:relative}.language-trigger{padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:#20172b;color:#eee;cursor:pointer}.language-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:130px;padding:6px;border:1px solid var(--line);border-radius:12px;background:#17111f;box-shadow:0 12px 32px #0008}.language-menu[hidden]{display:none}.language-menu button{display:block;width:100%;padding:9px 11px;border:0;border-radius:7px;background:transparent;color:#eee;text-align:left;cursor:pointer}.language-menu button:hover{background:#392052}
 
 .login-language{position:relative;display:flex;justify-content:flex-end;margin-bottom:14px}.login-language>button{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#20172b;color:#eee}.login-language>div{position:absolute;right:0;top:calc(100% + 7px);z-index:30;min-width:130px;padding:6px;border:1px solid var(--line);border-radius:12px;background:#17111f;box-shadow:0 12px 32px #0008}.login-language>div[hidden]{display:none}.login-language>div button{display:block;width:100%;padding:9px 11px;border:0;border-radius:7px;background:transparent;color:#eee;text-align:left;cursor:pointer}.login-language>div button:hover{background:#392052}
+
+/* Shared language selector used by the site, privacy page, login and analytics */
+.language-picker{position:relative;display:inline-flex;align-items:center;flex:0 0 auto}
+.language-trigger{display:flex;align-items:center;gap:8px;min-height:38px;padding:9px 13px;border:1px solid rgba(201,174,255,.2);border-radius:999px;background:rgba(24,16,33,.88);color:#e8dcfa;font:800 11px Manrope,system-ui,sans-serif;letter-spacing:.04em;white-space:nowrap}
+.language-trigger:hover{border-color:rgba(201,174,255,.5);background:#2a2035}
+.language-globe{display:inline-grid;place-items:center;width:16px;height:16px;border:1px solid rgba(201,174,255,.55);border-radius:50%;font-size:12px;line-height:1}
+.language-chevron{color:#bda5d7;font-size:13px;transition:transform .18s}
+.language-trigger[aria-expanded="true"] .language-chevron{transform:rotate(180deg)}
+.language-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:100;min-width:148px;padding:6px;border:1px solid rgba(201,174,255,.2);border-radius:13px;background:rgba(20,13,29,.98);box-shadow:0 16px 40px #0008;backdrop-filter:blur(18px)}
+.language-menu[hidden]{display:none}
+.language-menu button{display:block;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#d9cce9;text-align:left;font:600 12px Manrope,system-ui,sans-serif}
+.language-menu button:hover{background:#a77af522;color:#fff;transform:none}
+.login-language{margin:0 0 18px auto}
