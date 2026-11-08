@@ -140,8 +140,10 @@ export default {
       if(url.pathname.startsWith("/api/telemetry/admin/"))return await admin(request,env,url);
       return json({error:"not_found"},404);
     } catch(error) {
+      console.error("[Kuru Telemetry] Request failed", {path:url.pathname, message:String(error?.message||error)});
       if(error?.message==="payload_too_large")return json({error:"payload_too_large"},413);
-      return json({error:"request_failed"},400);
+      if(error?.message==="invalid_payload")return json({error:"invalid_payload"},400);
+      return json({error:"internal_error"},500);
     }
   },
   async scheduled(_event,env,ctx) {
