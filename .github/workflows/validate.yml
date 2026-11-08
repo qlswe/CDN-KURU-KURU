@@ -1,0 +1,50 @@
+name: Validate site and telemetry
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check main_core.ru.js
+          node --check telemetry/sdk.js
+          node --check telemetry/privacy.js
+          node --check telemetry/dashboard.js
+          node --check telemetry/login.js
+          node --check telemetry/src/index.js
+      - name: Validate D1 schema
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          db = sqlite3.connect(':memory:')
+          db.executescript(Path('telemetry/schema.sql').read_text(encoding='utf-8'))
+          print('D1 schema SQL parsed successfully')
+          PY
+      - name: Check HTML parsing
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class Checker(HTMLParser):
+              def error(self, message):
+                  raise RuntimeError(message)
+          files = ['index.html', 'privacy.html', 'telemetry/dashboard.html', 'telemetry/login.html']
+          for name in files:
+              parser = Checker()
+              parser.feed(Path(name).read_text(encoding='utf-8'))
+              parser.close()
+              print(f'{name}: parsed')
+          PY
