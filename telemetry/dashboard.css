@@ -29,3 +29,5 @@ select,.filter-label select{appearance:none;-webkit-appearance:none;min-width:14
 select:hover{border-color:rgba(190,151,238,.55)}
 select:focus-visible{outline:0;border-color:#c18df0;box-shadow:0 0 0 3px rgba(177,132,232,.17)}
 select option{background:#17111f;color:#f5efff}
+
+.language-picker{position:relative}.language-trigger{padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:#20172b;color:#eee;cursor:pointer}.language-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:130px;padding:6px;border:1px solid var(--line);border-radius:12px;background:#17111f;box-shadow:0 12px 32px #0008}.language-menu[hidden]{display:none}.language-menu button{display:block;width:100%;padding:9px 11px;border:0;border-radius:7px;background:transparent;color:#eee;text-align:left;cursor:pointer}.language-menu button:hover{background:#392052}
