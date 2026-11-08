@@ -72,15 +72,15 @@ async function collect(req, env) {
   const height = boundedInt(data.screenHeight, 0, 10000, 0);
   const now = new Date().toISOString();
   const minute = Math.floor(Date.now() / 60000);
-  const throttle = await env.DB.prepare("INSERT INTO rate_limits(wbuid,window_minute,hits) VALUES(?,?,1) ON CONFLICT(wbuid) DO UPDATE SET window_minute=excluded.window_minute,hits=CASE WHEN rate_limits.window_minute=excluded.window_minute THEN rate_limits.hits+1 ELSE 1 END RETURNING hits").bind(data.wbuid, minute).first();
+  const throttle = await env["kuru-kuru"].prepare("INSERT INTO rate_limits(wbuid,window_minute,hits) VALUES(?,?,1) ON CONFLICT(wbuid) DO UPDATE SET window_minute=excluded.window_minute,hits=CASE WHEN rate_limits.window_minute=excluded.window_minute THEN rate_limits.hits+1 ELSE 1 END RETURNING hits").bind(data.wbuid, minute).first();
   if ((throttle?.hits || 0) > 30) return json({ error: "rate_limited" }, 429, { "Retry-After": "60" });
   let detail = {};
   if (data.type === "js_error") detail = { message: typeof data.message === "string" ? data.message.slice(0, 180).replace(/[\r\n\t]/g, " ") : "unknown" };
   else if (data.type === "performance") detail = { loadMs: boundedInt(data.loadMs, 0, 120000, 0) };
-  await env.DB.prepare(`INSERT INTO visitors(wbuid,created_at,last_seen,device,language,screen_width,screen_height,consent_version)
+  await env["kuru-kuru"].prepare(`INSERT INTO visitors(wbuid,created_at,last_seen,device,language,screen_width,screen_height,consent_version)
     VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(wbuid) DO UPDATE SET last_seen=excluded.last_seen,device=excluded.device,language=excluded.language,screen_width=excluded.screen_width,screen_height=excluded.screen_height`)
     .bind(data.wbuid, now, now, device, language, width, height, CONSENT_VERSION).run();
-  await env.DB.prepare("INSERT INTO events(wbuid,event_type,page,created_at,detail) VALUES(?,?,?,?,?)")
+  await env["kuru-kuru"].prepare("INSERT INTO events(wbuid,event_type,page,created_at,detail) VALUES(?,?,?,?,?)")
     .bind(data.wbuid, data.type, page, now, JSON.stringify(detail)).run();
   return json({ ok: true });
 }
@@ -101,16 +101,16 @@ async function admin(req, env, url) {
   if (req.method !== "GET") return json({ error: "method_not_allowed" }, 405);
   if (url.pathname.endsWith("/summary")) {
     const [totals, daily, devices, recent] = await Promise.all([
-      env.DB.prepare("SELECT COUNT(*) visitors FROM visitors").first(),
-      env.DB.prepare("SELECT substr(created_at,1,10) day, COUNT(*) events FROM events WHERE created_at >= datetime('now','-30 days') GROUP BY day ORDER BY day").all(),
-      env.DB.prepare("SELECT device, COUNT(*) count FROM visitors GROUP BY device").all(),
-      env.DB.prepare("SELECT wbuid,created_at,last_seen,device,language FROM visitors ORDER BY last_seen DESC LIMIT 100").all()
+      env["kuru-kuru"].prepare("SELECT COUNT(*) visitors FROM visitors").first(),
+      env["kuru-kuru"].prepare("SELECT substr(created_at,1,10) day, COUNT(*) events FROM events WHERE created_at >= datetime('now','-30 days') GROUP BY day ORDER BY day").all(),
+      env["kuru-kuru"].prepare("SELECT device, COUNT(*) count FROM visitors GROUP BY device").all(),
+      env["kuru-kuru"].prepare("SELECT wbuid,created_at,last_seen,device,language FROM visitors ORDER BY last_seen DESC LIMIT 100").all()
     ]);
-    const eventCount = await env.DB.prepare("SELECT COUNT(*) count FROM events WHERE created_at >= datetime('now','-30 days')").first();
+    const eventCount = await env["kuru-kuru"].prepare("SELECT COUNT(*) count FROM events WHERE created_at >= datetime('now','-30 days')").first();
     return json({ visitors: totals?.visitors || 0, events30d: eventCount?.count || 0, daily: daily.results || [], devices: devices.results || [], recent: recent.results || [] });
   }
   if (url.pathname.endsWith("/events")) {
-    const rows = await env.DB.prepare("SELECT event_type,page,created_at,detail,wbuid FROM events ORDER BY id DESC LIMIT 200").all();
+    const rows = await env["kuru-kuru"].prepare("SELECT event_type,page,created_at,detail,wbuid FROM events ORDER BY id DESC LIMIT 200").all();
     return json({ events: rows.results || [] });
   }
   return json({ error: "not_found" }, 404);
@@ -125,9 +125,9 @@ export default {
         if (!validOrigin(request)) return json({ error: "origin_denied" }, 403);
         const data = await parseBody(request);
         if (typeof data.wbuid !== "string" || !UUID_RE.test(data.wbuid)) return json({ error: "invalid_wbuid" }, 400);
-        await env.DB.prepare("DELETE FROM events WHERE wbuid=?").bind(data.wbuid).run();
-        await env.DB.prepare("DELETE FROM visitors WHERE wbuid=?").bind(data.wbuid).run();
-        await env.DB.prepare("DELETE FROM rate_limits WHERE wbuid=?").bind(data.wbuid).run();
+        await env["kuru-kuru"].prepare("DELETE FROM events WHERE wbuid=?").bind(data.wbuid).run();
+        await env["kuru-kuru"].prepare("DELETE FROM visitors WHERE wbuid=?").bind(data.wbuid).run();
+        await env["kuru-kuru"].prepare("DELETE FROM rate_limits WHERE wbuid=?").bind(data.wbuid).run();
         return json({ ok: true });
       }
       if (url.pathname.startsWith("/api/telemetry/admin/")) return await admin(request, env, url);
@@ -138,8 +138,8 @@ export default {
     }
   },
   async scheduled(_event, env, ctx) {
-    ctx.waitUntil(env.DB.prepare("DELETE FROM events WHERE created_at < datetime('now','-90 days')").run());
-    ctx.waitUntil(env.DB.prepare("DELETE FROM visitors WHERE last_seen < datetime('now','-90 days')").run());
-    ctx.waitUntil(env.DB.prepare("DELETE FROM rate_limits WHERE window_minute < (strftime('%s','now') / 60) - 1440").run());
+    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM events WHERE created_at < datetime('now','-90 days')").run());
+    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM visitors WHERE last_seen < datetime('now','-90 days')").run());
+    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM rate_limits WHERE window_minute < (strftime('%s','now') / 60) - 1440").run());
   }
 };
