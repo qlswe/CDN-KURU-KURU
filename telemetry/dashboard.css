@@ -46,3 +46,5 @@ select option{background:#17111f;color:#f5efff}
 .language-menu button{display:block;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#d9cce9;text-align:left;font:600 12px Manrope,system-ui,sans-serif}
 .language-menu button:hover{background:#a77af522;color:#fff;transform:none}
 .login-language{margin:0 0 18px auto}
+
+.language-globe{display:block;width:16px;height:16px;flex:0 0 16px;color:currentColor;border:0;border-radius:0;font-size:initial}
