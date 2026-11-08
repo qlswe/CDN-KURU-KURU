@@ -145,9 +145,13 @@ export default {
     }
   },
   async scheduled(_event,env,ctx) {
-    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM events WHERE created_at<datetime('now','-90 days')").run());
-    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM visitors WHERE last_seen<datetime('now','-90 days')").run());
-    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM rate_limits WHERE window_minute<(strftime('%s','now')/60)-1440").run());
-    ctx.waitUntil(env["kuru-kuru"].prepare("DELETE FROM ip_rate_limits WHERE window_minute<(strftime('%s','now')/60)-1440").run());
+    const db=env["kuru-kuru"];
+    ctx.waitUntil(db.prepare("DELETE FROM events WHERE created_at<datetime('now','-90 days')").run());
+    ctx.waitUntil(db.prepare("DELETE FROM visitors WHERE last_seen<datetime('now','-90 days')").run());
+    ctx.waitUntil(db.prepare("DELETE FROM rate_limits WHERE window_minute<(strftime('%s','now')/60)-1440").run());
+    ctx.waitUntil((async()=>{
+      await db.prepare("CREATE TABLE IF NOT EXISTS ip_rate_limits (ip_hash TEXT PRIMARY KEY, window_minute INTEGER NOT NULL, hits INTEGER NOT NULL DEFAULT 0)").run();
+      await db.prepare("DELETE FROM ip_rate_limits WHERE window_minute<(strftime('%s','now')/60)-1440").run();
+    })());
   }
 };
