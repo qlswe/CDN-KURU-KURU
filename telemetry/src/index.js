@@ -1,24 +1,21 @@
-import { createRemoteJWKSet, jwtVerify } from "jose";
-
 const ORIGIN = "https://kuru-kuru.ru";
 const CONSENT_VERSION = "1";
+const SESSION_COOKIE = "__Host-kuru_admin";
+const SESSION_TTL = 12 * 60 * 60;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PAGE_ALLOWLIST = new Set(["/", "/#work", "/#about", "/#interests", "/#contact"]);
 const EVENT_TYPES = new Set(["page_view", "section_view", "js_error", "performance"]);
 const cors = {
   "Access-Control-Allow-Origin": ORIGIN,
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, CF-Access-Jwt-Assertion",
+  "Access-Control-Allow-Headers": "Content-Type",
   "Vary": "Origin",
 };
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...cors, ...headers } });
 }
-function validOrigin(req) {
-  const origin = req.headers.get("Origin");
-  return origin === ORIGIN;
-}
+function validOrigin(req) { return req.headers.get("Origin") === ORIGIN; }
 function safePage(value) {
   if (typeof value !== "string") return "/";
   const path = value.split("?")[0].slice(0, 120);
@@ -30,24 +27,37 @@ function boundedInt(value, min, max, fallback) {
 function safeLanguage(value) {
   return typeof value === "string" && /^[a-z]{2,3}(-[A-Z]{2})?$/.test(value) ? value : "und";
 }
-async function accessAuthorized(request, env) {
-  const token = request.headers.get("Cf-Access-Jwt-Assertion");
-  if (!token || !env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD || env.ACCESS_TEAM_DOMAIN.startsWith("REPLACE_") || env.ACCESS_AUD.startsWith("REPLACE_")) return false;
-  try {
-    const issuer = "https://" + env.ACCESS_TEAM_DOMAIN;
-    const jwks = createRemoteJWKSet(new URL(issuer + "/cdn-cgi/access/certs"));
-    await jwtVerify(token, jwks, { issuer, audience: env.ACCESS_AUD });
-    return true;
-  } catch {
-    return false;
-  }
-}
 async function parseBody(req) {
   const length = Number(req.headers.get("Content-Length") || 0);
   if (length > 4096) throw new Error("payload_too_large");
   const data = await req.json();
   if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("invalid_payload");
   return data;
+}
+function bytesToBase64Url(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+async function sign(value, secret) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return bytesToBase64Url(new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value))));
+}
+async function createSession(secret) {
+  const payload = String(Math.floor(Date.now() / 1000) + SESSION_TTL);
+  return payload + "." + await sign(payload, secret);
+}
+async function validSession(request, env) {
+  if (!env.COOKIE_SECRET || env.COOKIE_SECRET.length < 32) return false;
+  const cookie = request.headers.get("Cookie") || "";
+  const match = cookie.split(";").map(x => x.trim()).find(x => x.startsWith(SESSION_COOKIE + "="));
+  if (!match) return false;
+  const token = match.slice(SESSION_COOKIE.length + 1);
+  const [expiry, signature, extra] = token.split(".");
+  if (!expiry || !signature || extra || !/^\d+$/.test(expiry) || Number(expiry) < Math.floor(Date.now() / 1000)) return false;
+  if (Number(expiry) > Math.floor(Date.now() / 1000) + SESSION_TTL + 60) return false;
+  const expected = await sign(expiry, env.COOKIE_SECRET);
+  return signature === expected;
 }
 async function collect(req, env) {
   if (!validOrigin(req)) return json({ error: "origin_denied" }, 403);
@@ -65,11 +75,8 @@ async function collect(req, env) {
   const throttle = await env.DB.prepare("INSERT INTO rate_limits(wbuid,window_minute,hits) VALUES(?,?,1) ON CONFLICT(wbuid) DO UPDATE SET window_minute=excluded.window_minute,hits=CASE WHEN rate_limits.window_minute=excluded.window_minute THEN rate_limits.hits+1 ELSE 1 END RETURNING hits").bind(data.wbuid, minute).first();
   if ((throttle?.hits || 0) > 30) return json({ error: "rate_limited" }, 429, { "Retry-After": "60" });
   let detail = {};
-  if (data.type === "js_error") {
-    detail = { message: typeof data.message === "string" ? data.message.slice(0, 180).replace(/[\r\n\t]/g, " ") : "unknown" };
-  } else if (data.type === "performance") {
-    detail = { loadMs: boundedInt(data.loadMs, 0, 120000, 0) };
-  }
+  if (data.type === "js_error") detail = { message: typeof data.message === "string" ? data.message.slice(0, 180).replace(/[\r\n\t]/g, " ") : "unknown" };
+  else if (data.type === "performance") detail = { loadMs: boundedInt(data.loadMs, 0, 120000, 0) };
   await env.DB.prepare(`INSERT INTO visitors(wbuid,created_at,last_seen,device,language,screen_width,screen_height,consent_version)
     VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(wbuid) DO UPDATE SET last_seen=excluded.last_seen,device=excluded.device,language=excluded.language,screen_width=excluded.screen_width,screen_height=excluded.screen_height`)
     .bind(data.wbuid, now, now, device, language, width, height, CONSENT_VERSION).run();
@@ -78,7 +85,19 @@ async function collect(req, env) {
   return json({ ok: true });
 }
 async function admin(req, env, url) {
-  if (!(await accessAuthorized(req, env))) return json({ error: "unauthorized" }, 401);
+  if (url.pathname === "/api/telemetry/admin/login" && req.method === "POST") {
+    if (!validOrigin(req)) return json({ error: "origin_denied" }, 403);
+    if (!env.TELEMETRY_ADMIN_PASSWORD || !env.COOKIE_SECRET || env.COOKIE_SECRET.length < 32) return json({ error: "server_not_configured" }, 503);
+    const data = await parseBody(req);
+    if (typeof data.password !== "string" || data.password.length > 256 || data.password !== env.TELEMETRY_ADMIN_PASSWORD) return json({ error: "invalid_credentials" }, 401);
+    const token = await createSession(env.COOKIE_SECRET);
+    return json({ ok: true }, 200, { "Set-Cookie": SESSION_COOKIE + "=" + token + "; Max-Age=" + SESSION_TTL + "; Path=/api/telemetry/admin; HttpOnly; Secure; SameSite=Strict" });
+  }
+  if (url.pathname === "/api/telemetry/admin/logout" && req.method === "POST") {
+    if (!validOrigin(req)) return json({ error: "origin_denied" }, 403);
+    return json({ ok: true }, 200, { "Set-Cookie": SESSION_COOKIE + "=; Max-Age=0; Path=/api/telemetry/admin; HttpOnly; Secure; SameSite=Strict" });
+  }
+  if (!(await validSession(req, env))) return json({ error: "unauthorized" }, 401);
   if (req.method !== "GET") return json({ error: "method_not_allowed" }, 405);
   if (url.pathname.endsWith("/summary")) {
     const [totals, daily, devices, recent] = await Promise.all([
