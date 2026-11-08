@@ -21,3 +21,5 @@ CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at);
 CREATE INDEX IF NOT EXISTS idx_events_wbuid ON events(wbuid);
 
 CREATE TABLE IF NOT EXISTS rate_limits (wbuid TEXT PRIMARY KEY, window_minute INTEGER NOT NULL, hits INTEGER NOT NULL DEFAULT 0);
+
+CREATE TABLE IF NOT EXISTS consent_metrics (day TEXT NOT NULL, decision TEXT NOT NULL CHECK(decision IN ('accepted','declined')), version TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, PRIMARY KEY(day,decision,version));
