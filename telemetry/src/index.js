@@ -36,6 +36,16 @@ function safeTechProfile(data,cf) {
     region:typeof cf?.regionCode==="string"?cf.regionCode.slice(0,8):"unknown"
   };
 }
+async function recordConsent(req,env) {
+  if(!validOrigin(req))return json({error:"origin_denied"},403);
+  const data=await parseBody(req);
+  if(data.version!==CONSENT_VERSION||!["accepted","declined"].includes(data.decision))return json({error:"invalid_consent_choice"},400);
+  const db=env["kuru-kuru"];
+  await db.prepare("CREATE TABLE IF NOT EXISTS consent_metrics (day TEXT NOT NULL, decision TEXT NOT NULL CHECK(decision IN ('accepted','declined')), version TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, PRIMARY KEY(day,decision,version))").run();
+  const now=new Date().toISOString(),day=now.slice(0,10);
+  await db.prepare("INSERT INTO consent_metrics(day,decision,version,count,updated_at) VALUES(?,?,?,1,?) ON CONFLICT(day,decision,version) DO UPDATE SET count=consent_metrics.count+1,updated_at=excluded.updated_at").bind(day,data.decision,CONSENT_VERSION,now).run();
+  return json({ok:true});
+}
 async function collect(req,env) {
   if(!validOrigin(req))return json({error:"origin_denied"},403);
   const data=await parseBody(req);
@@ -72,14 +82,17 @@ async function admin(req,env,url) {
   if(req.method!=="GET")return json({error:"method_not_allowed"},405);
   const db=env["kuru-kuru"];
   if(url.pathname.endsWith("/summary")) {
-    const [totals,daily,devices,recent,eventCount]=await Promise.all([
+    const [totals,daily,devices,recent,eventCount,consentTotals,consentDaily]=await Promise.all([
       db.prepare("SELECT COUNT(*) visitors FROM visitors").first(),
       db.prepare("SELECT substr(created_at,1,10) day,COUNT(*) events FROM events WHERE created_at>=datetime('now','-30 days') GROUP BY day ORDER BY day").all(),
       db.prepare("SELECT device,COUNT(*) count FROM visitors GROUP BY device").all(),
       db.prepare("SELECT wbuid,created_at,last_seen,device,language FROM visitors ORDER BY last_seen DESC LIMIT 100").all(),
-      db.prepare("SELECT COUNT(*) count FROM events WHERE created_at>=datetime('now','-30 days')").first()
+      db.prepare("SELECT COUNT(*) count FROM events WHERE created_at>=datetime('now','-30 days')").first(),
+      db.prepare("SELECT decision,SUM(count) count FROM consent_metrics WHERE version=? GROUP BY decision").bind(CONSENT_VERSION).all(),
+      db.prepare("SELECT day,decision,count FROM consent_metrics WHERE version=? AND day>=date('now','-30 days') ORDER BY day").bind(CONSENT_VERSION).all()
     ]);
-    return json({visitors:totals?.visitors||0,events30d:eventCount?.count||0,daily:daily.results||[],devices:devices.results||[],recent:recent.results||[]});
+    const choices=Object.fromEntries((consentTotals.results||[]).map(x=>[x.decision,x.count]));
+    return json({visitors:totals?.visitors||0,events30d:eventCount?.count||0,daily:daily.results||[],devices:devices.results||[],recent:recent.results||[],consent:{accepted:choices.accepted||0,declined:choices.declined||0,daily:consentDaily.results||[]}});
   }
   if(url.pathname.endsWith("/events")) { const rows=await db.prepare("SELECT event_type,page,created_at,detail,wbuid FROM events ORDER BY id DESC LIMIT 200").all();return json({events:rows.results||[]}); }
   return json({error:"not_found"},404);
@@ -89,6 +102,7 @@ export default {
     const url=new URL(request.url);
     if(request.method==="OPTIONS")return new Response(null,{status:204,headers:cors});
     try {
+      if(url.pathname==="/api/telemetry/consent"&&request.method==="POST")return await recordConsent(request,env);
       if(url.pathname==="/api/telemetry/collect"&&request.method==="POST")return await collect(request,env);
       if(url.pathname==="/api/telemetry/revoke"&&request.method==="POST") {
         if(!validOrigin(request))return json({error:"origin_denied"},403);
