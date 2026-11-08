@@ -84,6 +84,7 @@ async function admin(req,env,url) {
   if(req.method!=="GET")return json({error:"method_not_allowed"},405);
   const db=env["kuru-kuru"];
   if(url.pathname.endsWith("/summary")) {
+    await db.prepare("CREATE TABLE IF NOT EXISTS consent_metrics (day TEXT NOT NULL, decision TEXT NOT NULL, version TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, PRIMARY KEY(day,decision,version))").run();
     const [totals,daily,devices,recent,eventCount,consentTotals,consentDaily]=await Promise.all([
       db.prepare("SELECT COUNT(*) visitors FROM visitors").first(),
       db.prepare("SELECT substr(created_at,1,10) day,COUNT(*) events FROM events WHERE created_at>=datetime('now','-30 days') GROUP BY day ORDER BY day").all(),
